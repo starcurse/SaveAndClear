@@ -1,0 +1,36 @@
+Neccessary programs:
+PowerShell (Set-ExecutionPolicy needs to be enabled for unsigned scripts in some form)
+WindowsEventViewer (Security, Application, and System Logs)
+
+Necessary permissions:
+Auditor
+
+Instructions: 
+1. Take these instructions, the SaveAndClear folder, and the InitialSetup folder and add them to your removable media (or computer). Add the removable media to the intended computer and add the "InitialSetup" and "SaveAndClear" folder to your C: drive. The instructions file is already located within the SaveAndClear folder, so you don't need to bring an extra copy over.
+2. The path for those folders should now be "C:\SaveAndClear" and "C:\InitialSetup". Navigate into the InitialSetup folder and right click the "InititalSetup.ps1" file. 
+3. Click "Run with PowerShell".
+4. The SaveAndClear folder should now be located in "C:\Security\Scripts".
+5. Run the Master script("C:\Security\Scripts\SaveAndClear\SaCMasterScript.ps1") in a PowerShell session as admin and ensure it doesn't generate any errors. This script will take anywhere from a few seconds to a few minutes to run. Any errors will be logged in "C:\Security\Results\SaveAndClear\Logs". If you encounter errors, check that log and make a note of the script that was having trouble running and contact Carson Bybee.
+6. Check the SaveAndClear log in the Results directory to see which computers saved successfuly and which did not. 
+7. You are now good to go! The script should be configured. Run the script when you want to save and clear the logs. The InitialSetup folder will be deleted when the Master script is run.
+
+Summary: 
+This set of scripts is written primarily for systems that have several workstations and VMs as a way to shorten audit times and bring the task of saving away from human error as much as possible. This is achieved by using two small scripts that are called upon by one master script to run in consecutive order, storing any generated errors in a log within the Security folder. 
+The master script first calls upon a setup script, which looks for certain "verification documents" to determine whether the host computer has the neccessary folder framework to execute properly. If it does not, the setup script adds the neccessary framework and generates applicable verification documents. If the verification documents already exist, then no action is taken. The setup script then prompts the user to enter relevant info and stores that info in separate documents that are called upon in the main script.
+The next script that is called upon is the main part of the script. This script saves the Security, Application, and System event logs and saves them using information that was provided the first time the Setup script was run.
+
+Potential drawbacks: 
+1. This script does not take storage of the drive of the computer into account. If the computer has no more storage, you may experience errors.
+2. This script is not meant to be run via task scheduler.
+3. Get-WMIObject does not play well with firewalls.
+4. Do not run this script twice on the same day if the event log has been cleared successfully! The wording of the script checks for the existence of a log under today's date and only clears the log if those files exist. Running this script twice would result in that log being cleared without saving a new version of that log. For this reason, if the event logs fail to clear, it is best to delete the .evtx files that were generated if they exist and run the script again.
+
+Maintenance: 
+If any information changes such as additional computers, more computer names, or different desired pathways, you can change that by navigating to "C:\Security\Scripts\SaveAndClear\Documents" and changing your value. NOTE: Do not change the formatting of the documents! If you are adding a computer, make sure the additional computer is added on like the previous one.
+
+CURRENTLY KNOWN ERRORS: 
+RPC Server Unavaliable:
+This error is triggered when Windows Management Instrumentation cannot access the target workstation or server. 
+Fixes: Ping the workstation to ensure it is accessible via the network. If you cannot ping by name but can via IP, then it is a DNS issue. Ensure that remote registry, windows management instrumentation, and RPC related services are set to automatic and allowed through the firewall. 
+
+If there are any questions or concerns, contact Carson Bybee at carson.bybee@sdl.usu.edu (work email), or ckbybee@gmail.com (personal email). I am also accessible via zoom.
