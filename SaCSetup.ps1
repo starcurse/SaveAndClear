@@ -100,7 +100,7 @@ try {
 }
 try {
     if ($PathsAreSet -eq $false) {
-        $ComputerNames = Read-Host "Please type the name(s) of the computer(s) whose logs will be saved and cleared. (Format: WS1, DNS1, WS2)"
+        $ComputerNames = Read-Host "Please type the name(s) of the computer(s) whose logs will be saved and cleared. (Format: WS1,DNS1,WS2)"
         Set-Content -Path $ComputerDoc $ComputerNames 
         $SecurityPathway = Read-Host "Please type the partial pathway for the location you would like the security audit log to be saved. (Format: \Security\Example2\Example3)"
         Set-Content -Path $SecPath $SecurityPathway

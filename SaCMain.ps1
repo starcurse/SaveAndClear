@@ -28,9 +28,9 @@ foreach ($pcName in $ComputerNames){
     $Security = Get-WmiObject -Class Win32_NTEventlogFile -ComputerName $pcName -filter "LogfileName = 'Security'"
     $Application = Get-WmiObject -Class Win32_NTEventlogFile -ComputerName $pcName -filter "LogfileName = 'Application'"
     $System = Get-WmiObject -Class Win32_NTEventlogFile -ComputerName $pcName -filter "LogfileName = 'System'"
-    $Security.BackupEventlog($("$SecurityPathway\$CurrentDate.evtx") -f $pcName)
-    $Application.BackupEventlog($("$ApplicationPathway\$CurrentDate`_App.evtx") -f $pcName)
-    $System.BackupEventlog($("$SystemPathway\$CurrentDate`_Sys.evtx") -f $pcName)
+    $Security.BackupEventlog($("$SecurityPathway\$CurrentDate.evtx"))
+    $Application.BackupEventlog($("$ApplicationPathway\$CurrentDate`_App.evtx"))
+    $System.BackupEventlog($("$SystemPathway\$CurrentDate`_Sys.evtx"))
 }
 }
 } catch {
