@@ -3,7 +3,7 @@ PowerShell (Set-ExecutionPolicy needs to be enabled for unsigned scripts in some
 WindowsEventViewer (Security, Application, and System Logs)
 
 Necessary permissions:
-Auditor
+Auditor (See currently known errors)
 
 Instructions: 
 1. Take these instructions, the SaveAndClear folder, and the InitialSetup folder and add them to your removable media (or computer). Add the removable media to the intended computer and add the "InitialSetup" and "SaveAndClear" folder to your C: drive. The instructions file is already located within the SaveAndClear folder, so you don't need to bring an extra copy over.
@@ -21,16 +21,15 @@ The next script that is called upon is the main part of the script. This script 
 
 Potential drawbacks: 
 1. This script does not take storage of the drive of the computer into account. If the computer has no more storage, you may experience errors.
-2. This script is not meant to be run via task scheduler.
+2. This script is not meant to be run via task scheduler. A fully automated version of the script can be written, but the drawbacks of this should be discussed first.
 3. Get-WMIObject does not play well with firewalls.
-4. Do not run this script twice on the same day if the event log has been cleared successfully! The wording of the script checks for the existence of a log under today's date and only clears the log if those files exist. Running this script twice would result in that log being cleared without saving a new version of that log. For this reason, if the event logs fail to clear, it is best to delete the .evtx files that were generated if they exist and run the script again.
 
 Maintenance: 
 If any information changes such as additional computers, more computer names, or different desired pathways, you can change that by navigating to "C:\Security\Scripts\SaveAndClear\Documents" and changing your value. NOTE: Do not change the formatting of the documents! If you are adding a computer, make sure the additional computer is added on like the previous one.
 
-CURRENTLY KNOWN ERRORS: 
+CURRENTLY KNOWN ERRORS:
 RPC Server Unavaliable:
 This error is triggered when Windows Management Instrumentation cannot access the target workstation or server. 
-Fixes: Ping the workstation to ensure it is accessible via the network. If you cannot ping by name but can via IP, then it is a DNS issue. Ensure that remote registry, windows management instrumentation, and RPC related services are set to automatic and allowed through the firewall. 
+Fixes: You most likely included a space after the comma when typing your computer names. Make sure to format the computer names like so: "WS1,WS2,DNS1" etc. If that does not fix the issue, ping the workstation to ensure it is accessible via the network. If you cannot ping by name but can via IP, then it is a DNS issue. Ensure that remote registry, windows management instrumentation, and RPC related services are set to automatic and allowed through the firewall.
 
 If there are any questions or concerns, contact Carson Bybee at carson.bybee@sdl.usu.edu (work email), or ckbybee@gmail.com (personal email). I am also accessible via zoom.

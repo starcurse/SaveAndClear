@@ -14,23 +14,46 @@ $ApplicationPathway = Get-Content -Path $AppPath
 $SystemPathway = Get-Content -Path $SysPath
 $DriveLetter = Get-Content -Path $DrivePath
 
-#For each computer, save the event logs. If the computer is the host computer, then don't ask for credentials. This is the spot I get the "RPC Server Unavaliable" error.
+#For each computer, save the event logs. If the computer is the host computer, then don't ask for credentials.
 try {
 foreach ($pcName in $ComputerNames){
+    $i = 1
+    $SecuritySaved = Test-Path -Path "\\$pcName\$DriveLetter$\$SecurityPathway\$CurrentDate.evtx"
+    $ApplicationSaved = Test-Path -Path "\\$pcName\$DriveLetter$\$ApplicationPathway\$CurrentDate`_App.evtx"
+    $SystemSaved = Test-Path -Path "\\$pcName\$DriveLetter$\$SystemPathway\$CurrentDate`_Sys.evtx"
+    $SecurityDup = Test-Path -Path "\\$pcName\$DriveLetter$\$SecurityPathway\$CurrentDate - $i.evtx"
     if ($pcName -ne $env:COMPUTERNAME) {
     $Security = Get-WmiObject -Class Win32_NTEventlogFile -Credential $Credential -ComputerName $pcName -filter "LogfileName = 'Security'"
     $Application = Get-WmiObject -Class Win32_NTEventlogFile -Credential $Credential -ComputerName $pcName -filter "LogfileName = 'Application'"
     $System = Get-WmiObject -Class Win32_NTEventlogFile -Credential $Credential -ComputerName $pcName -filter "LogfileName = 'System'"
+    if ($SecuritySaved -eq $true){
+        while ($SecurityDup -eq $true){
+            $i++
+        }
+        $Security.BackupEventlog($("$SecurityPathway\$CurrentDate - $i.evtx") -f $pcName)
+        $Application.BackupEventlog($("$ApplicationPathway\$CurrentDate`_App - $i.evtx") -f $pcName)
+        $System.BackupEventlog($("$SystemPathway\$CurrentDate`_Sys - $i.evtx") -f $pcName)
+    } else {
     $Security.BackupEventlog($("$SecurityPathway\$CurrentDate.evtx") -f $pcName)
     $Application.BackupEventlog($("$ApplicationPathway\$CurrentDate`_App.evtx") -f $pcName)
     $System.BackupEventlog($("$SystemPathway\$CurrentDate`_Sys.evtx") -f $pcName)
-} if ($pcname -eq $env:COMPUTERNAME){
+}} if ($pcname -eq $env:COMPUTERNAME){
     $Security = Get-WmiObject -Class Win32_NTEventlogFile -ComputerName $pcName -filter "LogfileName = 'Security'"
     $Application = Get-WmiObject -Class Win32_NTEventlogFile -ComputerName $pcName -filter "LogfileName = 'Application'"
     $System = Get-WmiObject -Class Win32_NTEventlogFile -ComputerName $pcName -filter "LogfileName = 'System'"
+    if ($SecuritySaved -eq $true){
+        while ($SecurityDup -eq $true){
+            $i++
+            $SecurityDup = Test-Path -Path "\\$pcName\$DriveLetter$\$SecurityPathway\$CurrentDate - $i.evtx"
+        }
+        $Security.BackupEventlog($("$SecurityPathway\$CurrentDate - $i.evtx") -f $pcName)
+        $Application.BackupEventlog($("$ApplicationPathway\$CurrentDate`_App - $i.evtx") -f $pcName)
+        $System.BackupEventlog($("$SystemPathway\$CurrentDate`_Sys - $i.evtx") -f $pcName)
+    } else {
     $Security.BackupEventlog($("$SecurityPathway\$CurrentDate.evtx"))
     $Application.BackupEventlog($("$ApplicationPathway\$CurrentDate`_App.evtx"))
     $System.BackupEventlog($("$SystemPathway\$CurrentDate`_Sys.evtx"))
+}
 }
 }
 } catch {
@@ -42,19 +65,19 @@ foreach ($pcName in $ComputerNames) {
     $ApplicationSaved = Test-Path -Path "\\$pcName\$DriveLetter$\$ApplicationPathway\$CurrentDate`_App.evtx"
     $SystemSaved = Test-Path -Path "\\$pcName\$DriveLetter$\$SystemPathway\$CurrentDate`_Sys.evtx"
     if ($SecuritySaved -eq $true) {
-        Clear-EventLog -LogName Security -ComputerName $pcName
+        Clear-EventLog -LogName Security -ComputerName $pcName -Credential $Credential
         Write-OutPut "Security Log for $pcName cleared at $timestamp" | Add-Content -Path $Scriptlog
     } else {
         Write-OutPut "Security Log for $pcName failed to save at $timestamp and was not cleared" | Add-Content -Path $Scriptlog
     }
     if ($ApplicationSaved -eq $true) {
-        Clear-EventLog -LogName Application -ComputerName $pcName
+        Clear-EventLog -LogName Application -ComputerName $pcName -Credential $Credential
         Write-OutPut "Application Log for $pcName cleared at $timestamp" | Add-Content -Path $Scriptlog
     } else {
         Write-OutPut "Application Log for $pcName failed to save at $timestamp and was not cleared" | Add-Content -Path $Scriptlog
     }
     if ($SystemSaved -eq $true) {
-        Clear-EventLog -LogName System -ComputerName $pcName
+        Clear-EventLog -LogName System -ComputerName $pcName -Credential $Credential
         Write-OutPut "System Log for $pcName cleared at $timestamp" | Add-Content -Path $Scriptlog
     } else {
         Write-OutPut "System Log for $pcName failed to save at $timestamp and was not cleared" | Add-Content -Path $Scriptlog
